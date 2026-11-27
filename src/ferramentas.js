@@ -4,7 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { LaguecoErro } from "./api.js";
 
-export const VERSAO = "0.2.1";
+export const VERSAO = "0.2.2";
 
 export function criarServidor(api) {
   const server = new McpServer(

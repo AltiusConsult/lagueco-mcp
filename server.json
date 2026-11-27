@@ -8,13 +8,22 @@
     "source": "github"
   },
   "websiteUrl": "https://altiusanalytics.com.br",
-  "version": "0.2.1",
+  "icons": [
+    {
+      "src": "https://plataforma.altiusanalytics.com.br/brand/aplicacoes/favicon-192.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "192x192"
+      ]
+    }
+  ],
+  "version": "0.2.2",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@altiusanalytics/lagueco-mcp",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "transport": {
         "type": "stdio"
       },

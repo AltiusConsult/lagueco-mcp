@@ -6,18 +6,33 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { LaguecoApi } from "../src/api.js";
 import { criarServidor, VERSAO } from "../src/ferramentas.js";
+import { baseUrl, chaveDoToken } from "../src/oauth.js";
 
 function erroJsonRpc(res, status, mensagem) {
   res.status(status).setHeader("Content-Type", "application/json");
   res.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32001, message: mensagem }, id: null }));
 }
 
+// Aceita três formas de autenticação:
+//   1. token OAuth emitido por este servidor (Authorization: Bearer lgc1....)
+//   2. chave da API direto (Authorization: Bearer alt_live_...)
+//   3. chave da API no cabeçalho X-Lagueco-Api-Key
 function chaveDoPedido(req) {
   const auth = req.headers["authorization"] || "";
   const m = auth.match(/^Bearer\s+(.+)$/i);
-  if (m) return m[1].trim();
+  if (m) {
+    const valor = m[1].trim();
+    if (valor.startsWith("lgc1.")) return { chave: chaveDoToken(valor), oauth: true };
+    return { chave: valor };
+  }
   const alt = req.headers["x-lagueco-api-key"];
-  return typeof alt === "string" ? alt.trim() : "";
+  return { chave: typeof alt === "string" ? alt.trim() : "" };
+}
+
+function pedirLogin(req, res, motivo) {
+  const meta = `${baseUrl(req)}/.well-known/oauth-protected-resource/mcp`;
+  res.setHeader("WWW-Authenticate", `Bearer resource_metadata="${meta}"${motivo ? `, error="invalid_token", error_description="${motivo}"` : ""}`);
+  return erroJsonRpc(res, 401, motivo || "Autentique com OAuth ou envie a chave da API da Lagueco em Authorization: Bearer alt_live_...");
 }
 
 export default async function handler(req, res) {
@@ -27,7 +42,7 @@ export default async function handler(req, res) {
       nome: "Lagueco MCP",
       versao: VERSAO,
       transporte: "streamable-http",
-      autenticacao: "Authorization: Bearer <chave da API da Lagueco>",
+      autenticacao: "OAuth 2.1 (PKCE) ou Authorization: Bearer <chave da API da Lagueco>",
       documentacao: "https://github.com/AltiusConsult/lagueco-mcp",
     }));
   }
@@ -36,8 +51,8 @@ export default async function handler(req, res) {
     return erroJsonRpc(res, 405, "Use POST. Este servidor não mantém sessão.");
   }
 
-  // Sem chave, o assistente ainda pode ver a lista de ferramentas; cada chamada pede a chave.
-  const chave = chaveDoPedido(req) || null;
+  const { chave, oauth } = chaveDoPedido(req);
+  if (!chave) return pedirLogin(req, res, oauth ? "Token expirado ou inválido. Renove o acesso." : "");
 
   const servidor = criarServidor(new LaguecoApi({ chave, baseUrl: process.env.LAGUECO_API_URL }));
   const transporte = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });

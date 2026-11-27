@@ -29,6 +29,14 @@ O que cada chave enxerga depende das permissões dela. Uma ferramenta sem permis
 
 Endereço: `https://mcp.altiusanalytics.com.br/mcp` (Streamable HTTP).
 
+### No Claude e no ChatGPT (login OAuth)
+
+Adicione um conector personalizado com o endereço `https://mcp.altiusanalytics.com.br/mcp`. Ao conectar, abre uma página da Lagueco pedindo a chave da API. A chave é conferida na Lagueco e vai cifrada dentro do token de acesso: o servidor não grava nada. Revogar a chave na Lagueco encerra a conexão.
+
+Detalhes: OAuth 2.1 com PKCE (S256) e registro dinâmico de cliente. Metadados em `/.well-known/oauth-protected-resource/mcp` e `/.well-known/oauth-authorization-server`. Token de acesso de 1 hora, renovação de 90 dias.
+
+### Em Cursor, VS Code e outros (chave no cabeçalho)
+
 Envie a chave da API da Lagueco em um destes cabeçalhos:
 
 - `Authorization: Bearer alt_live_...`

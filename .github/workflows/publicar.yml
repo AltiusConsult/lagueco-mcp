@@ -82,7 +82,9 @@ jobs:
             echo "::error::O segredo MCP_PRIVATE_KEY não existe ou está vazio. Crie em Settings > Secrets and variables > Actions."
             exit 1
           fi
-          ./mcp-publisher login dns --domain altiusanalytics.com.br
+          CHAVE="$(printf '%s' "${MCP_PRIVATE_KEY}" | tr -d '[:space:]')"
+          echo "Tamanho da chave: ${#CHAVE} caracteres (o esperado é 64)."
+          ./mcp-publisher login dns --domain altiusanalytics.com.br --private-key "${CHAVE}"
 
       - name: Publicar no registro do MCP
         run: ./mcp-publisher publish

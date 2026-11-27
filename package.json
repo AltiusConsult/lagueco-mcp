@@ -6,19 +6,33 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "mcp",
+    "crm",
+    "lagueco",
+    "agencias"
+  ],
+  "author": "Altius Analytics (Altius Desenvolvimento de Programa Ltda.)",
   "license": "UNLICENSED",
   "type": "module",
   "bin": {
     "lagueco-mcp": "src/index.js"
   },
-  "private": "true",
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.2",
     "zod": "3.25.76"
-  }
+  },
+  "mcpName": "br.com.altiusanalytics/lagueco",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AltiusConsult/lagueco-mcp.git"
+  },
+  "homepage": "https://altiusanalytics.com.br",
+  "files": [
+    "src",
+    "README.md"
+  ]
 }

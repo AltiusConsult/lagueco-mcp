@@ -25,7 +25,31 @@ Produto da Altius Analytics (Altius Desenvolvimento de Programa Ltda.).
 
 O que cada chave enxerga depende das permissões dela. Uma ferramenta sem permissão responde com o erro 403 e diz qual permissão falta.
 
-## Como usar
+## Versão hospedada (sem instalar nada)
+
+Endereço: `https://mcp.altiusanalytics.com.br/mcp` (Streamable HTTP).
+
+Envie a chave da API da Lagueco em um destes cabeçalhos:
+
+- `Authorization: Bearer alt_live_...`
+- `X-Lagueco-Api-Key: alt_live_...`
+
+Exemplo para Cursor ou VS Code:
+
+```json
+{
+  "mcpServers": {
+    "lagueco": {
+      "url": "https://mcp.altiusanalytics.com.br/mcp",
+      "headers": { "Authorization": "Bearer alt_live_..." }
+    }
+  }
+}
+```
+
+O servidor hospedado não guarda a chave nem o conteúdo dos pedidos. Cada pedido usa a chave enviada naquele momento.
+
+## Versão instalada
 
 1. Na Lagueco, vá em **Integrações > Para desenvolvedores** e crie uma chave. Para começar, prefira **Só ler dados**.
 2. Configure o assistente. Exemplo para o Claude Desktop (`claude_desktop_config.json`):

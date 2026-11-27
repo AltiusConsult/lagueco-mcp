@@ -36,11 +36,8 @@ export default async function handler(req, res) {
     return erroJsonRpc(res, 405, "Use POST. Este servidor não mantém sessão.");
   }
 
-  const chave = chaveDoPedido(req);
-  if (!chave) {
-    res.setHeader("WWW-Authenticate", 'Bearer realm="lagueco"');
-    return erroJsonRpc(res, 401, "Envie a chave da API da Lagueco no cabeçalho Authorization: Bearer alt_live_... (Integrações > Para desenvolvedores).");
-  }
+  // Sem chave, o assistente ainda pode ver a lista de ferramentas; cada chamada pede a chave.
+  const chave = chaveDoPedido(req) || null;
 
   const servidor = criarServidor(new LaguecoApi({ chave, baseUrl: process.env.LAGUECO_API_URL }));
   const transporte = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });

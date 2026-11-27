@@ -11,6 +11,9 @@ export class LaguecoApi {
   }
 
   async req(metodo, caminho, { query, corpo } = {}) {
+    if (!this.chave) {
+      throw new LaguecoErro("Falta a chave da API da Lagueco. Envie no cabeçalho Authorization: Bearer alt_live_... ou X-Lagueco-Api-Key (Integrações > Para desenvolvedores).");
+    }
     const url = new URL(this.base + caminho);
     for (const [k, v] of Object.entries(query ?? {})) {
       if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));

@@ -41,8 +41,16 @@ jobs:
           test "$PKG" = "$SRV" && test "$PKG" = "$SRVPKG"
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then test "${GITHUB_REF_NAME#v}" = "$PKG"; fi
 
-      - name: Publicar no npm
-        run: npm publish --access public
+      - name: Publicar no npm (se a versão ainda não existir)
+        run: |
+          set -euo pipefail
+          NOME="$(node -p "require('./package.json').name")"
+          VERSAO="$(node -p "require('./package.json').version")"
+          if npm view "$NOME@$VERSAO" version >/dev/null 2>&1; then
+            echo "$NOME@$VERSAO já está no npm. Pulando."
+          else
+            npm publish --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -69,7 +77,12 @@ jobs:
       - name: Entrar no registro do MCP (domínio)
         env:
           MCP_PRIVATE_KEY: ${{ secrets.MCP_PRIVATE_KEY }}
-        run: ./mcp-publisher login dns --domain altiusanalytics.com.br
+        run: |
+          if [ -z "${MCP_PRIVATE_KEY}" ]; then
+            echo "::error::O segredo MCP_PRIVATE_KEY não existe ou está vazio. Crie em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          ./mcp-publisher login dns --domain altiusanalytics.com.br
 
       - name: Publicar no registro do MCP
         run: ./mcp-publisher publish

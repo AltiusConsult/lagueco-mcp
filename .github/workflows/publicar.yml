@@ -1,11 +1,12 @@
 # Publica o pacote no npm e a ficha no registro oficial do MCP.
-# Dispara quando uma tag de versão (ex.: v0.1.0) é enviada ao GitHub.
+# Dispara pelo botão "Run workflow" em Actions > Publicar, ou por uma tag de versão (ex.: v0.1.0).
 # Segredos necessários em Settings > Secrets and variables > Actions:
 #   NPM_TOKEN        token de publicação do npm (organização altiusanalytics)
 #   MCP_PRIVATE_KEY  chave privada Ed25519 (hex) ligada ao TXT do domínio altiusanalytics.com.br
 name: Publicar
 
 on:
+  workflow_dispatch:
   push:
     tags: ["v*"]
 
@@ -33,11 +34,12 @@ jobs:
       - name: Conferir versões
         run: |
           set -euo pipefail
-          TAG="${GITHUB_REF#refs/tags/v}"
           PKG="$(node -p "require('./package.json').version")"
           SRV="$(node -p "require('./server.json').version")"
-          echo "tag=$TAG package.json=$PKG server.json=$SRV"
-          test "$TAG" = "$PKG" && test "$TAG" = "$SRV"
+          SRVPKG="$(node -p "require('./server.json').packages[0].version")"
+          echo "package.json=$PKG server.json=$SRV pacote=$SRVPKG"
+          test "$PKG" = "$SRV" && test "$PKG" = "$SRVPKG"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then test "${GITHUB_REF_NAME#v}" = "$PKG"; fi
 
       - name: Publicar no npm
         run: npm publish --access public

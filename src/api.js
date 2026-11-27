@@ -23,7 +23,7 @@ export class LaguecoApi {
           Authorization: `Bearer ${this.chave}`,
           Accept: "application/json",
           ...(corpo !== undefined ? { "Content-Type": "application/json" } : {}),
-          "User-Agent": "lagueco-mcp/0.1.0",
+          "User-Agent": "lagueco-mcp",
         },
         body: corpo !== undefined ? JSON.stringify(corpo) : undefined,
         signal: AbortSignal.timeout(30_000),
